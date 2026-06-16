@@ -6,18 +6,24 @@ from taxi.models import Driver, Car
 
 class DriverCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
-        model = Driver
+        model = get_user_model()
         fields = UserCreationForm.Meta.fields + (
             "first_name",
             "last_name",
             "license_number",
         )
 
+    def clean_license_number(self):
+        return validate_license(self.cleaned_data["license_number"])
+
 
 class DriverLicenseUpdateForm(forms.ModelForm):
     class Meta:
         model = Driver
         fields = ("license_number",)
+
+    def clean_license_number(self):
+        return validate_license(self.cleaned_data["license_number"])
 
 
 class CarForm(forms.ModelForm):
@@ -30,3 +36,8 @@ class CarForm(forms.ModelForm):
     class Meta:
         model = Car
         fields = "__all__"
+
+def validate_license(license_number):
+    if len(license_number) != 8 or not license_number[:3].isalpha() or not license_number[3:].isdigit():
+        raise forms.ValidationError("License must be 3 uppercase letters and 5 digits")
+    return license_number.upper()
