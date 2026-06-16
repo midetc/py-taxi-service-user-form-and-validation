@@ -41,6 +41,7 @@ class CarForm(forms.ModelForm):
 def validate_license(license_number):
     if (len(license_number) != 8
             or not license_number[:3].isalpha()
+            or not license_number[:3].isupper()
             or not license_number[3:].isdigit()):
         raise forms.ValidationError("License must be 3 "
                                     "uppercase letters and 5 digits")
